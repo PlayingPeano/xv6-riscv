@@ -1,7 +1,8 @@
 .globl main
 main:
-    addi sp, sp, -8
+    addi sp, sp, -22
     mv a0, sp
+    li a1, 22
     call gets
     beqz a0, .Lerror
 
@@ -26,16 +27,19 @@ main:
     addi a0, a0, %lo(.LC0)
     call printf
 
-    addi sp, sp, 8
+    addi sp, sp, 22
     li a0, 0
     call exit
 
 .Lerror:
-    lui a0, %hi(.LC1)
-    addi a0, a0, %lo(.LC1)
-    call printf
+    li a0, 2
+    lui a1, %hi(.LC1)
+    addi a1, a1, %lo(.LC1)
+    li a2, 14
+    li a7, 64
+    ecall
+    addi sp, sp, 22
     li a0, 1
-    addi sp, sp, 8
     call exit
 
 parse_number:

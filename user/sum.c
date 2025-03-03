@@ -1,12 +1,13 @@
 #include "kernel/types.h"
 #include "user/user.h"
 
-const int BUFFSIZE = 8;
+const int BUFFSIZE = 22;
 
 void ReadToEnd()
 {
 	char c = '\0';
-	while (read(0, &c, sizeof(char)) && c != '\n'){};
+
+	while (read(0, &c, 1) > 0 && c != '\n')	{};
 }
 
 void Validate(char **buff)
@@ -19,7 +20,7 @@ void Validate(char **buff)
 	{
 		if ((**buff) < '0' || (**buff) > '9')
 		{
-			fprintf(2, "Invalid format 22\n");
+			fprintf(2, "Invalid format\n");
 			exit(1);
 		}
 		++(*buff);
@@ -34,7 +35,7 @@ int main(int argc, char **argv)
 
 	for (;;)
 	{
-		int readCheck = read(0, &c, sizeof(char));
+		int readCheck = read(0, &c, 1);
 		if (readCheck < 0 || ind + 1 >= BUFFSIZE)
 		{
 			if (readCheck < 0)
@@ -85,7 +86,7 @@ int main(int argc, char **argv)
 	int lNum = 0;
 	if (buff[0] == '-')
 	{
-		lNum = -atoi(buff + sizeof(char));
+		lNum = -atoi(buff + 1);
 	}
 	else
 	{
@@ -103,7 +104,6 @@ int main(int argc, char **argv)
 		rNum = atoi(secondNumber);
 	}
 	printf("|%d %d|\n", lNum, rNum);
-	// printf("%d\n", lNum + rNum);
 	printf("%d\n", add(lNum, rNum));
 
 	exit(0);
