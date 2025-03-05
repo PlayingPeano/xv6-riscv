@@ -34,18 +34,6 @@ int main(int argc, char *argv[])
 			return EXIT_FAILURE;
 		}
 
-        // char buff[BUFF_SIZE];
-        // ssize_t bytes = 0;
-        // while ((bytes = read(pipefd[0], buff, BUFF_SIZE)) > 0) 
-		// {
-        //     if (write(STDOUT_FILENO, buff, bytes) < 0)
-        //     {
-        //         perror("Error: occured while writing\n");
-        //         close(pipefd[0]);
-        //         return EXIT_FAILURE;
-        //     }
-        // }
-
         char buff[BUFF_SIZE];
         ssize_t bytes = 0;
         while ((bytes = read(pipefd[0], buff, BUFF_SIZE)) > 0) 
@@ -63,7 +51,7 @@ int main(int argc, char *argv[])
                 written += n;
             }
         }
-        
+
         if (bytes < 0)
         {
             perror("Error: occured while reading\n");
