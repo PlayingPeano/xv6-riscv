@@ -141,6 +141,8 @@ UPROGS=\
 	$U/_zombie\
 	$U/_sum\
 	$U/_sum_asm\
+	$U/_processesWait\
+	$U/_pipe\
 
 fs.img: mkfs/mkfs README $(UPROGS)
 	mkfs/mkfs fs.img README $(UPROGS)
