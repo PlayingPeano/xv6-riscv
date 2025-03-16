@@ -84,25 +84,40 @@ main(int argc, char* argv[])
             int len = strlen(argv[i]);
 			for (int j = 0; j < len; ++j)
 			{
-				if (idx == BUFFSIZE)
+				if (idx >= BUFFSIZE - 1) //to handle a possibility of idx = BUFFSIZE + 1 when adding '\n' at the end.
 				{
-					if (write(pipefd[1], buff, BUFFSIZE) == -1) 
+					int written = 0;
+					while (written < idx)
 					{
-            		    fprintf(2, "Error: Can't write\n");
-						exit(1);
-            		}
+						int n = write(pipefd[1], buff + written, idx - written);
+                        if (n == -1) 
+						{
+                            fprintf(2, "Error: Can't write\n");
+                            exit(1);
+                        }
+                        written += n;
+					}
 					idx = 0;
 				}
 				buff[idx++] = argv[i][j];
 			}
 			buff[idx++] = '\n';
         }
-		if (write(pipefd[1], buff, idx) == -1)
-		{
-            fprintf(2, "Error: Can't write\n");
-			exit(1);
-        }
 
+		if (idx > 0)
+		{
+			int written = 0;
+			while (written < idx)
+			{
+				int n = write(pipefd[1], buff + written, idx - written);
+        	    if (n == -1) 
+				{
+        	        fprintf(2, "Error: Can't write\n");
+        	        exit(1);
+        	    }
+        	    written += n;
+			}
+		}
 
         if (close(pipefd[1])) 
 		{

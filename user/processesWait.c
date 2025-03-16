@@ -28,7 +28,11 @@ main(int argc, char* argv[])
 
 		if (killMode)
 		{
-			kill(pid);
+			if (kill(pid) < 0)
+			{
+				fprintf(2, "Error: kill failed for pid %d\n", pid);
+				exit(1);
+			}
 		}
 
 		int childExitCode = 0;
