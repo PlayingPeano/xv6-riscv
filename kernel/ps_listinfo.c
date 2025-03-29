@@ -24,7 +24,7 @@ sys_ps_listinfo(void)
         for (p = proc; p < &proc[NPROC]; ++p) 
 		{
 			acquire(&p->lock);
-			if (p->state != UNUSED)
+			if (p->state != UNUSED && p->state != USED)
 			{
 				++pcnt;
 			}
@@ -33,28 +33,30 @@ sys_ps_listinfo(void)
 		  return pcnt;
     }
 
-    if ((uint64)plist < 0 || (uint64)plist + lim * sizeof(struct procinfo) > myproc()->sz)
+    if ((uint64)plist < 0x1000 || (uint64)plist + lim * sizeof(struct procinfo) > curr_proc->sz)
     {
         return -2;
     }
 
-    for (p = proc; p < &proc[NPROC]; ++p) 
+    for (p = proc; p < &proc[NPROC] && pcnt < lim; ++p)
     {
         acquire(&p->lock);
         if (p->state != UNUSED && p->state != USED)
-        {
-            if (pcnt >= lim) 
-            {
-                release(&p->lock);   
-                return -1;
-            }
-          
+        { 
             pinfo.pid = p->pid;
             safestrcpy(pinfo.name, p->name, sizeof(pinfo.name));
             pinfo.state = p->state;
         
             acquire(&wait_lock);
-            pinfo.ppid = (p->parent) ? p->parent->pid : 0;
+            if (p->parent) 
+            {
+                acquire(&p->parent->lock);
+                pinfo.ppid = p->parent->pid;
+                release(&p->parent->lock);
+            } else
+            {
+                pinfo.ppid = 0;
+            }
             release(&wait_lock);
 
             if (copyout(curr_proc->pagetable, (uint64)(plist + pcnt), (char*)&pinfo, sizeof(pinfo)) < 0) 
@@ -62,10 +64,21 @@ sys_ps_listinfo(void)
                 release(&p->lock);
                 return -2;
             }
-
             ++pcnt;
         }
         release(&p->lock);
     }
+
+    for (; p < &proc[NPROC]; ++p) 
+    {
+        acquire(&p->lock);
+        if (p->state != UNUSED && p->state != USED) 
+        {
+            release(&p->lock);
+            return -1;
+        }
+        release(&p->lock);
+    }
+
     return pcnt;
 }

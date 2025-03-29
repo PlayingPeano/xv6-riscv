@@ -2,10 +2,24 @@
 #include "kernel/stat.h"
 #include "user/user.h"
 
+const char* state_to_str(int state) 
+{
+    switch(state) 
+    {
+        case 0:  return "UNUSED";
+        case 1:  return "USED";
+        case 2:  return "SLEEPING";
+        case 3:  return "RUNNABLE";
+        case 4:  return "RUNNING";
+        case 5:  return "ZOMBIE";
+        default: return "UNKNOWN";
+    }
+}
+
 char*
 get_pname(struct procinfo *plist, int cnt, int ppid)
 {
-    for (int i = 0; i < cnt; i++) 
+    for (int i = 0; i < cnt; ++i) 
 	{
         if (plist[i].pid == ppid)
 		{
@@ -34,11 +48,11 @@ main(int argc, char *argv[])
         exit(0);
     }
 
-    for (int i = 0; i < ret; i++) 
+    for (int i = 0; i < ret; ++i)
 	{
         char *pname = get_pname(plist, ret, plist[i].ppid);
-        printf("ID:%d\tNAME:%s\tSTATE:%d\tPPID:%d\tPNAME:%s\n",
-               plist[i].pid, plist[i].name, plist[i].state, plist[i].ppid, pname);
+        printf("pid: %d, name: %s, state: %s, ppid: %d, PNAME:%s\n",
+			plist[i].pid, plist[i].name, state_to_str(plist[i].state), plist[i].ppid, pname);
     }
 
     free(plist);
