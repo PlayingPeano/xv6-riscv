@@ -9,3 +9,11 @@ struct stat {
   short nlink; // Number of links to file
   uint64 size; // Size of file in bytes
 };
+
+struct procinfo
+ {
+   int pid;
+   int state;
+   int ppid;
+   char name[16];
+ };
