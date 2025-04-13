@@ -508,25 +508,20 @@ sys_pipe(void)
 uint64
 sys_mutex_lock(void)
 {
-  // printf("SYS_LOCK_BEG\n");
   int fd;
   struct file* f;
 
   argfd(0, &fd, &f);
   if (fd < 0 || f->type != FD_MUTEX) {
-    // printf("SYS_LOCK_-1\n");
     return -1;
   }
-  // printf("SYS_LOCK_SLEEP\n");
   acquiresleep(f->mutex);
-  // printf("SYS_LOCK_END\n");
   return 0;
 }
 
 uint64
 sys_mutex_unlock(void)
 {
-  // printf("SYS_UNL_BEG\n");
   int fd;
   struct file* f;
 
@@ -536,10 +531,8 @@ sys_mutex_unlock(void)
   }
   if (!holdingsleep(f->mutex)) {
     return -1;
-  } else {
-    releasesleep(f->mutex);
-  }
-  // printf("SYS_UNL_END\n");
+  }  
+  releasesleep(f->mutex);
   return 0;
 }
 

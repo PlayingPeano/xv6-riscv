@@ -9,14 +9,16 @@ test_unsync()
   if (pid == 0) {
     for (int i = 1; i <= 5; i++) {
       for (char c = 'a'; c <= 'z'; c++) {
-        printf("%d: arg %d, char '%c'\n", getpid(), i, c);
+        char str[2] = {c, '\0'};
+        printf("%d: arg %d, char %s\n", getpid(), i, str);
       }
     }
     exit(0);
   } else {
     for (int i = 1; i <= 5; i++) {
       for (char c = 'A'; c <= 'Z'; c++) {
-        printf("%d: arg %d, char '%c'\n", getpid(), i, c);
+        char str[2] = {c, '\0'};
+        printf("%d: arg %d, char %s\n", getpid(), i, str);
       }
     }
     wait(0);
@@ -32,8 +34,9 @@ test_sync()
   if (pid == 0) {
     for (int i = 1; i <= 5; i++) {
       for (char c = 'a'; c <= 'z'; c++) {
+        char str[2] = {c, '\0'};
         mutex_lock(m);
-        printf("%d: arg %d, char '%c'\n", getpid(), i, c);
+        printf("%d: arg %d, char %s\n", getpid(), i, str);
         mutex_unlock(m);
       }
     }
@@ -41,8 +44,9 @@ test_sync()
   } else {
     for (int i = 1; i <= 5; i++) {
       for (char c = 'A'; c <= 'Z'; c++) {
+        char str[2] = {c, '\0'};
         mutex_lock(m);
-        printf("%d: arg %d, char '%c'\n", getpid(), i, c);
+        printf("%d: arg %d, char %s\n", getpid(), i, str);
         mutex_unlock(m);
       }
     }

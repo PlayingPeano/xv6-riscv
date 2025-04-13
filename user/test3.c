@@ -82,6 +82,26 @@ test_unlock_foreign()
   close(m);
 }
 
+void
+test_lock_unlock()
+{
+  int m = mutex();
+  if (mutex_lock(m) == 0) {
+    printf("mutex locked successfully\n");
+  } else {
+    printf("lock failed\n");
+    exit(0);
+  }
+  
+  if (mutex_unlock(m) == 0) {
+    printf("mutex unlocked successfully\n");
+  } else {
+    printf("unlock failed\n");
+    exit(0);
+  }
+  close(m);
+}
+
 int
 main()
 {
@@ -89,5 +109,6 @@ main()
   test_close_locked();
   test_exit();
   test_unlock_foreign();
+  test_lock_unlock();
   exit(0);
 }
