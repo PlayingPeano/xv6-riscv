@@ -63,7 +63,6 @@ main()
     fprintf(2, "date: failed to read RTC\n");
     exit(1);
   }
-  // printf("RTC raw: %lu ns\n", time);
   int y, mo, d, h, mi, s, ns;
   convert_time(time, &y, &mo, &d, &h, &mi, &s, &ns);
 
