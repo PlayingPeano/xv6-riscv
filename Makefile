@@ -165,6 +165,9 @@ ifndef CPUS
 CPUS := 3
 endif
 
+RTC_DATE ?= localtime
+QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic \
+            -global virtio-mmio.force-legacy=false -rtc base=$(RTC_DATE)
 QEMUOPTS = -machine virt -bios none -kernel $K/kernel -m 128M -smp $(CPUS) -nographic -rtc base=localtime
 QEMUOPTS += -global virtio-mmio.force-legacy=false
 QEMUOPTS += -drive file=fs.img,if=none,format=raw,id=x0

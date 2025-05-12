@@ -189,4 +189,5 @@ void            virtio_disk_intr(void);
 #define NELEM(x) (sizeof(x)/sizeof((x)[0]))
 
 // rtc.c
+void 			 rtc_init(void);
 uint64           rtc_get_time(void);

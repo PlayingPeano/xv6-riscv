@@ -100,6 +100,7 @@ sys_rtctime(void)
   if (addr < 0)
     return -1;
   uint64 time = rtc_get_time();
+  // printf("RTC raw: %lu ns\n", time);
   if (copyout(myproc()->pagetable, addr, (char*)&time, sizeof(time)) < 0)
     return -1;
   return 0;

@@ -5,6 +5,14 @@
 #include "riscv.h"
 #include "defs.h"
 #include "fs.h"
+#include "spinlock.h"
+
+struct spinlock rtclock;
+void 
+rtc_init() 
+{
+  initlock(&rtclock, "rtc");
+}
 
 uint32
 rtc_read_low()
@@ -22,9 +30,12 @@ uint64
 rtc_get_time()
 {
   uint32 low, high;
-  do {
+  acquire(&rtclock);
+  do 
+  {
     low = rtc_read_low();
     high = rtc_read_high();
   } while (rtc_read_high() != high);
-  return ((uint64)high << 32ull) | low;
+  release(&rtclock);
+  return ((uint64)high << 32) | low;
 }
