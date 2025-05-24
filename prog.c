@@ -120,9 +120,48 @@ void read_node(FILE* file, uint32_t inode_pa, struct inode* inode) {
 
     fseek(file, inode_pa + I_BLOCK, SEEK_SET);
     fread(inode->pointers, UINT32_SIZE, 15, file);
-    for (size_t i = 0; i < 15; ++i) {
+    for (size_t i = 0; i < 15; ++i)
         inode->pointers[i] = le32toh(inode->pointers[i]);
+}
+
+struct read_helper {
+    FILE* file;
+    uint8_t* b_data;
+    uint32_t itr;
+    uint32_t block_size;
+};
+
+void read_block(uint64_t ptr, size_t to_read, struct read_helper* rh) {
+    if (ptr != 0) {
+        fseek(rh->file, (uint64_t)ptr * rh->block_size, SEEK_SET);
+        fread(rh->b_data, to_read, 1, rh->file);
     }
+    else
+        memset(rh->b_data, 0, to_read);
+    fwrite(rh->b_data, 1, to_read, stdout);
+}
+
+size_t read_pointer(uint64_t ptr, uint64_t rem_size, int8_t cur_level, int8_t max_level, struct read_helper* rh) {
+    if (rem_size == 0)
+        return 0;
+    if (cur_level == max_level) {
+        size_t all_read = 0;
+        for (size_t i = 0; i < rh->itr && rem_size > 0; ++i) {
+            size_t to_read = rh->block_size > rem_size ? rem_size : rh->block_size;
+            read_block(ptr + i * UINT32_SIZE, to_read, rh);
+            all_read += to_read;
+            rem_size -= to_read;
+        }
+        return all_read;
+    }
+    size_t all_read = 0;
+    size_t cur_read = 0;
+    for (size_t i = 0; i < rh->itr && rem_size > 0; ++i) {
+        cur_read = read_pointer((ptr + i * UINT32_SIZE) * rh->block_size, rem_size, cur_level + 1, max_level, rh);
+        all_read += cur_read;
+        rem_size -= cur_read;
+    }
+    return all_read;
 }
 
 int main(int argc, char* argv[]) {
@@ -147,14 +186,23 @@ int main(int argc, char* argv[]) {
 
     uint8_t* b_data = malloc(sb.block_size);
     size_t rem_size = inode.size;
+
+    struct read_helper rh = {
+        .file = file,
+        .b_data = b_data,
+        .itr = sb.block_size / UINT32_SIZE,
+        .block_size = sb.block_size
+    };
+
     for (size_t i = 0; i < 12 && rem_size > 0; ++i) {
-        if (inode.pointers[i] == 0)
-            continue;
         size_t to_read = sb.block_size > rem_size ? rem_size : sb.block_size;
-        fseek(file, (uint64_t)inode.pointers[i] * sb.block_size, SEEK_SET);
-        fread(b_data, to_read, 1, file);
-        fwrite(b_data, 1, to_read, stdout);
+        read_block(inode.pointers[i], to_read, &rh);
+        rem_size -= to_read;
     }
+
+    rem_size -= read_pointer((uint64_t)inode.pointers[12] * sb.block_size, rem_size, 1, 1, &rh);
+    rem_size -= read_pointer((uint64_t)inode.pointers[13] * sb.block_size, rem_size, 1, 2, &rh);
+    rem_size -= read_pointer((uint64_t)inode.pointers[14] * sb.block_size, rem_size, 1, 3, &rh);
 
     free(b_data);
     fclose(file);
