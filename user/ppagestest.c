@@ -20,6 +20,10 @@ void test_global_variable() {
   
   print_test_header("Initial state");
   ppages(0, 0, 0);
+
+  print_test_header("After clearing flags");
+  mppages(0, 0, 3);
+  ppages(0, 0, 0);
   
   print_test_header("After reading");
   temp = global_data;
@@ -40,6 +44,10 @@ void test_stack_variable() {
   
   print_test_header("Initial state");
   ppages(0, 0, 0);
+
+  print_test_header("After clearing flags");
+  mppages(0, 0, 3);
+  ppages(0, 0, 0);
   
   print_test_header("After reading");
   temp = stack_var;
@@ -57,12 +65,9 @@ void test_stack_array() {
   print_test_header("STACK ARRAY");
   int temp;
   int array_size = 200 * sizeof(int);
+  int stack_array[200];
   
   print_test_header("Initial state");
-  ppages(0, 0, 0);
-  
-  int stack_array[200];
-  print_test_header("After allocation");
   ppages(0, 0, 0);
   
   print_test_header("After clearing flags");
