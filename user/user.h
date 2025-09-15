@@ -22,6 +22,8 @@ int getpid(void);
 char* sbrk(int);
 int sleep(int);
 int uptime(void);
+int ppages(const void*, int, int);
+int mppages(const void*, int, int);
 
 // ulib.c
 int stat(const char*, struct stat*);
