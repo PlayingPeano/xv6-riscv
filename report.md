@@ -221,25 +221,48 @@ SIGINT handled
 **Ввод**
 ```bash
 cat > echo_fifo
+Hi
+Again hi
+^C
+cat > echo_fifo
+a
+rest_of_input
 
-c
 ^C
 ```
 
 **Вывод**
 ```zsh
 Waiting for data...
+Reading...
+Reading...
+Hi
+Reading...
+Reading...
+Again hi
+Reading...
 Waiting for data...
-
+Reading...
+a
 Reading...
 ^C
 SIGINT received
-c
 SIGINT: finishing reading... then terminate
+Reading...
+Reading...
+Reading...
+Reading...
+rest_of_input
+Reading...
+
+Reading...
 SIGINT handled
 ```
 
-Это было тяжело показать...
-
-Видим, что во время блокировки `read`, будильник выводил, что происходит чтение. После получения `SIGINT` написал, что заканчивает с чтением перед завершением работы. Сразу после завершился.
+Тут видно, что при открытии `fifo`, мы просто возвращаем то, что нам посылают.
+Если тишина, то периодически выводим `Reading...`.
+Если канал закрывается, то программа возвращается к привычному ожиданию.
+В аналогичной ситуации, когда канал открыт и мы получаем `SIGINT`,
+программа сначала дождётся закрытия канала, выполняя привычные действия.
+После закрытия сразу завершает выполнение.
 

@@ -65,7 +65,7 @@ int main(int argc, char **argv)
 		cleanup();
 		return EXIT_FAILURE;
 	}
-    sig_hup = 0;
+	sig_hup = 0;
 
 	create_fifo();
 
@@ -114,13 +114,13 @@ void run_server(void)
 		{
 			write_log("SIGINT handled\n");
 			cleanup();
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		}
 		if (sig_term)
 		{
 			write_log("SIGTERM handled\n");
 			cleanup();
-			exit(EXIT_FAILURE);
+			exit(EXIT_SUCCESS);
 		}
 	}
 }
@@ -187,7 +187,7 @@ void response2signal()
 	{
 		write_log("SIGTERM: terminating...\n");
 		cleanup();
-		exit(EXIT_FAILURE);
+		exit(EXIT_SUCCESS);
 	}
 	if (sig_usr1)
 	{
@@ -220,6 +220,7 @@ int read_fifo(int fifo_fd)
 			if (errno == EINTR)
 			{
 				response2signal();
+				continue;
 			}
 			perror("Error in read_fifo: bad read FIFO");
 			return -1;
